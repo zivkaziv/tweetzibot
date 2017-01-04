@@ -1,0 +1,14 @@
+{
+  "name": "twitterzibot",
+  "version": "0.0.1",
+  "description": "A simple bot that twits response",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "ZivKaZiv",
+  "license": "MIT",
+  "dependencies": {
+    "twit": "^2.2.5"
+  }
+}
