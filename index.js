@@ -54,7 +54,7 @@ function handleSingleTweet(tweet){
 
 function replayTweetToUser(tweet,user){
   let tweetText = '';
-  if(tweet.text.indexOf('כביש החוף')){
+  if(tweet.text.indexOf('כביש החוף') > 1){
     tweetText = 'Hey @' + tweet.user.screen_name + ' check this clip https://www.youtube.com/watch?v=2ytxv_m7KL0 ye ye ye';
   }
   console.log('tweeting ' + tweetText);
