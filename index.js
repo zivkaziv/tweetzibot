@@ -17,19 +17,21 @@ mongoose.connection.on('error', () => {
 
 try {
   let interval  
-  interval = setInterval(checkTwittsToRespod, 2000)
+  interval = setInterval(checkTwittsToRespod, 20000)
 } catch (e) {
   clearInterval(interval)
 }
 
 function checkTwittsToRespod () {
-  Setting.findOne({ 'is_service_enable':'true' }, (err, setting) => {
+  Setting.findOne({ key:'is_service_enable'}, (err, setting) => {
      if (err) { return done(err); }
-     if(setting){
+     if(setting && setting.value == 'true'){
+       console.log('Start running.', chalk.red('✗'));       
        //Get tweets
        twitMessager.searchTweets('כביש החוף',10).then(function(tweets){
          //for every tweet
          tweets = tweets.filter((tweet, index, self) => self.findIndex((t) => {return t.user.id === tweet.user.id; }) === index)
+         console.log('Found ' + tweets.length + ' tweets');       
          for (var tweetIndex = 0; tweetIndex < tweets.length; tweetIndex++) {
             handleSingleTweet(tweets[tweetIndex]);
          }
@@ -46,28 +48,41 @@ function handleSingleTweet(tweet){
     let validDate = new Date();
     validDate.setDate(validDate.getDate()-1);
     //Check if the user not exist || we didn't respond on his tweet for the last 24 hours
-    if(!user || new Date(user.last_tweet) < validDate) {
+    if( !user || new Date(user.last_tweet) < validDate) {
+      //answer only on tweets from the last hour
+      let validTweetTime = new Date();
+      validTweetTime.setHours(validTweetTime.getHours() - 3);
+      if(new Date(tweet.created_at) > validTweetTime){
         replayTweetToUser(tweet,user);
+      }else{
+        console.log('Really old tweet of ' + tweet.user.screen_name);       
+      }
+    }else{
+      console.log('We are not going to send tweet to ' + tweet.user.screen_name);       
     }
   })
 }
 
 function replayTweetToUser(tweet,user){
   let tweetText = '';
-  if(tweet.text.indexOf('כביש החוף') > 1){
-    tweetText = 'Hey @' + tweet.user.screen_name + ' check this clip https://www.youtube.com/watch?v=2ytxv_m7KL0 ye ye ye';
-  }
-  console.log('tweeting ' + tweetText);
-  // twitMessager.createAndPost(tweetText,tweet);
-  if(!user){
-    user = new User();
-    user.twitter_user_id = tweet.user.id;
-    user.twitter_user_name = tweet.user.screen_name;
-  }
-  user.last_tweet = new Date();
-  user.update(user,{upsert: true},function(err,user){
-    if (!err){
-      console.log(user + ' saved');
+  tweetText = 'הי @' + tweet.user.screen_name + ' זה ממש מזכיר לי את הקליפ https://www.youtube.com/watch?v=2ytxv_m7KL0 ';
+  tweetText += 'יה יה יה...';
+  
+  twitMessager.createAndPost(tweetText,tweet).then(function(){
+   console.log('tweeting ' + tweetText);
+  },function(err){
+    console.log('Failed to replay tweet, Mark this user anyway...');
+  });
+
+   if(!user){
+      user = new User();
+      user.twitter_user_id = tweet.user.id_str;
+      user.twitter_user_name = tweet.user.screen_name;
     }
-  })
+    user.last_tweet = new Date();
+    user.update(user,{upsert: true},function(err,user){
+      if (!err){
+        console.log(user + ' saved');
+      }
+   });
 }

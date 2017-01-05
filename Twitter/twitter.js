@@ -8,12 +8,14 @@ module.exports = {
       status: message
     }
     if(tweetToResponseOn){
-      tweet.in_reply_to_status_id = tweetToResponseOn.id
+      tweet.in_reply_to_status_id = tweetToResponseOn.id_str
     }
     return new Promise(function (resolve, reject) {
       twit.post('statuses/update', tweet, function (err) {
-        if (err) return console.log('error', err)
-        console.log('Twgit posted /,,/,')
+        if (err){
+          reject(err)
+        }
+        resolve();
       })
     });
   },
