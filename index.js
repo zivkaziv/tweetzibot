@@ -17,7 +17,7 @@ mongoose.connection.on('error', () => {
 
 try {
   let interval
-  interval = setInterval(checkTwittsToRespod, 20000)
+  interval = setInterval(checkTwittsToRespod, 120000)
 } catch (e) {
   clearInterval(interval)
 }
