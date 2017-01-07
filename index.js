@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 
 const twitMessager = require('./Twitter/twitter')
 const Setting = require('./models/Setting');
-const User = require('./models/User');
+const User = require('./models/user');
 
 dotenv.load({ path: '.env.example' });
 mongoose.Promise = global.Promise;
