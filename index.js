@@ -5,19 +5,19 @@ const dotenv = require('dotenv');
 
 const twitMessager = require('./Twitter/twitter')
 const Setting = require('./models/Setting');
-const User = require('./models/User');
+const User = require('./models/user');
 
 dotenv.load({ path: '.env.example' });
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
+mongoose.connect(process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
 });
 
 try {
-  let interval  
-  interval = setInterval(checkTwittsToRespod, 20000)
+  let interval
+  interval = setInterval(checkTwittsToRespod, 120000)
 } catch (e) {
   clearInterval(interval)
 }
@@ -26,24 +26,24 @@ function checkTwittsToRespod () {
   Setting.findOne({ key:'is_service_enable'}, (err, setting) => {
      if (err) { return done(err); }
      if(setting && setting.value == 'true'){
-       console.log('Start running.', chalk.red('✗'));       
+       console.log('Start running.', chalk.red('✗'));
        //Get tweets
        // twitMessager.searchTweets('כביש החוף',10).then(function(tweets){
        twitMessager.searchTweets('ים',10).then(function(tweets){
          //for every tweet
          tweets = tweets.filter((tweet, index, self) => self.findIndex((t) => {return t.user.id === tweet.user.id; }) === index)
-         console.log('Found ' + tweets.length + ' tweets');       
+         console.log('Found ' + tweets.length + ' tweets');
          for (var tweetIndex = 0; tweetIndex < tweets.length; tweetIndex++) {
             handleSingleTweet(tweets[tweetIndex]);
          }
        })
      }
   });
-  
+
 }
 
 function handleSingleTweet(tweet){
-  //Try to find the user in the DB  
+  //Try to find the user in the DB
   User.findOne({twitter_user_id:tweet.user.id_str},function(err,user){
     if (err) { return done(err); }
     let validDate = new Date();
@@ -56,10 +56,10 @@ function handleSingleTweet(tweet){
       if(new Date(tweet.created_at) > validTweetTime){
         replayTweetToUser(tweet,user);
       }else{
-        console.log('Really old tweet of ' + tweet.user.screen_name);       
+        console.log('Really old tweet of ' + tweet.user.screen_name);
       }
     }else{
-      console.log('We are not going to send tweet to ' + tweet.user.screen_name);       
+      console.log('We are not going to send tweet to ' + tweet.user.screen_name);
     }
   })
 }
@@ -68,7 +68,7 @@ function replayTweetToUser(tweet,user){
   let tweetText = '';
   tweetText = 'הי @' + tweet.user.screen_name + ' איזה שמש... https://www.youtube.com/watch?v=ogxRmmUeM0o ';
   tweetText += 'יה יה יה...';
-  
+
   twitMessager.createAndPost(tweetText,tweet).then(function(){
    console.log('tweeting ' + tweetText);
   },function(err){
