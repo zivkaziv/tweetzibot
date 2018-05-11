@@ -1,6 +1,12 @@
 
-const Twit = require('twit')
-let twit = new Twit(require('./config.js'));
+const Twit = require('twit');
+const config = {
+    consumer_key: process.env.CONSUMER_KEY,
+    consumer_secret: process.env.CONSUMER_SECRET,
+    access_token: process.env.ACCESS_TOKEN,
+    access_token_secret: process.env.ACCESS_TOKEN_SECRET
+};
+let twit = new Twit(config);
 
 module.exports = {
   createAndPost: function (message,tweetToResponseOn) {
