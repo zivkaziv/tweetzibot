@@ -30,7 +30,7 @@ function checkTwittsToRespod () {
        console.log('Start running.', chalk.red('✗'));
        //Get tweets
        // twitMessager.searchTweets('כביש החוף',10).then(function(tweets){
-       twitMessager.searchTweets('בריכה',10).then(function(tweets){
+       twitMessager.searchTweets('יפן',10).then(function(tweets){
          //for every tweet
          tweets = tweets.filter((tweet, index, self) => self.findIndex((t) => {return t.user.id === tweet.user.id; }) === index)
          console.log('Found ' + tweets.length + ' tweets');
@@ -67,9 +67,9 @@ function handleSingleTweet(tweet){
 
 function replayTweetToUser(tweet,user){
   let tweetText = '';
-  tweetText = 'הי @' + tweet.user.screen_name + ' איזה שמש... https://www.youtube.com/watch?v=ogxRmmUeM0o ';
+  tweetText = 'הי @' + tweet.user.screen_name + ' בדיוק צמד הגאונים שחרר את קאוואי ';
   // tweetText += 'יה יה יה...';
-  tweetText += 'איך היא אוהבת את השמש..';
+  tweetText += 'https://www.youtube.com/watch?v=Vj0GqUeUstM';
 
   twitMessager.createAndPost(tweetText,tweet).then(function(){
    console.log('tweeting ' + tweetText);
